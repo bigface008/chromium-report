@@ -3,6 +3,7 @@
 汪喆昊 2019/8/28
 
 - [Chromium 暑期工作报告](#chromium-暑期工作报告)
+  - [前言](#前言)
   - [准备工作](#准备工作)
   - [Chromium 编译](#chromium-编译)
     - [系统要求](#系统要求)
@@ -17,8 +18,12 @@
       - [`blink_symbol_level`](#blink_symbol_level)
     - [编译 Chromium](#编译-chromium)
     - [运行 Chromium](#运行-chromium)
-  - [Chromium 模型分离渲染原理](#chromium-模型分离渲染原理)
+  - [Chromium 相关文档](#chromium-相关文档)
     - [参考文档/博客列表](#参考文档博客列表)
+
+## 前言
+
+chromium源码有14GB左右，据谷歌官网的说法，速度较快的连接也可能要下30分钟，所以其实不大推荐用代理来下源码（连接速度慢且也许不大稳定，另外，某一个连接时间过长也许会增加服务器被封的几率？我瞎猜的）。我的解决方案是下到远程服务器，然后打包压缩，`scp`到本地。（不过这样搞也有很多问题）需要源码直接找我要就行了。另外，我家里用梯子极其不稳定，所以我并没有成功地在本地编译chromium（非常抱歉），而是在服务器上编译的。
 
 ## 准备工作
 
@@ -56,8 +61,6 @@ $ export ALL_PROXY="socks5://host:port"
 这样`wget`，`curl`也会使用shadowsocks代理。
 
 网上也有很多人推荐使用[`proxychains`](https://blog.fazero.me/2015/08/31/%E5%88%A9%E7%94%A8proxychains%E5%9C%A8%E7%BB%88%E7%AB%AF%E4%BD%BF%E7%94%A8socks5%E4%BB%A3%E7%90%86/)来做shadowsocks全局代理，不过我用这个方法失败了......
-
-chromium源码有14GB左右，据谷歌官网的说法，速度较快的连接也可能要下30分钟，所以其实不大推荐用代理来下源码（连接速度慢且也许不大稳定，另外，某一个连接时间过长也许会增加服务器被封的几率？我瞎猜的）。我的解决方案是下到远程服务器，然后打包压缩，`scp`到本地。（不过这样搞也有很多问题）
 
 ## Chromium 编译
 
@@ -204,15 +207,16 @@ $ autoninja -C out/Default chrome/test:unit_tests
 $ out/Default/chrome
 ```
 
-## Chromium 模型分离渲染原理
+## Chromium 相关文档
+
+要说明的是，[Siggraph上的谷歌论文](https://graphics.stanford.edu/papers/cr/cr_lowquality.pdf)中的**Chromium**和我们说的**Chromium**不是一个东西。前者是一个在不同GPU服务器间分发数据和OpenGL命令的框架，后者是一个浏览器。
 
 ### 参考文档/博客列表
 
+- [Siggraph上的Chromium论文](https://graphics.stanford.edu/papers/cr/cr_lowquality.pdf)
 - [Chromium多线程模型设计和实现分析](https://blog.csdn.net/luoshengyang/article/details/46855395)
 - [Chromium的GPU进程启动过程分析](https://blog.csdn.net/Luoshengyang/article/details/48123761)
-- [Siggraph上的Chromium模型分离渲染的论文](https://graphics.stanford.edu/papers/cr/cr_lowquality.pdf)
+- [Tracking graphics state for networked rendering](https://graphics.stanford.edu/papers/state_tracking/state_tracking.pdf) 谷歌论文中引用了这一篇中的跟踪OpenGL状态的机制。这种机制使用了一种结构来描述**graphic context**，使得计算两个不同**graphic context**的区别的操作变得十分高效。（也许对我们有帮助？我瞎猜的。
 
 谷歌官方的Chromium的GPU相关文档请看[这里](https://www.chromium.org/developers/design-documents/chromium-graphics)。
-
-下面的内容是我自己阅读了里面的一些文章以及谷歌之后做出的总结。
 
